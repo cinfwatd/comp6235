@@ -34,16 +34,18 @@
             <a class="site-nav-item site-brand" href="{{ url_for('index') }}">
                 <span class="glyphicon glyphicon-grain"></span> YelpUs</a>
 
-          <a class="site-nav-item {% if request.path == '/' %}active{% endif %}" href="#">Home</a>
-          <a class="site-nav-item {% if request.path == '/about' %}active{% endif %}"  href="#">About</a>
+          <a class="site-nav-item {% if request.path == '/' %}active{% endif %}"
+             href="{{ url_for('index') }}">Home</a>
+          <a class="site-nav-item {% if request.path == '/about' %}active{% endif %}"
+             href="{{ url_for('about') }}">About</a>
         </nav>
       </div>
     </div>
 
     <div class="container">
-        <div id="content">
+{#        <div id="content">#}
             {% block content %} {% endblock %}
-        </div>
+{#        </div>#}
     </div><!-- /.container -->
 
     <footer class="site-footer">
