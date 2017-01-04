@@ -21,14 +21,14 @@ def user():
 def admin():
     return render_template("admin.html")
 
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
         do_login()
     else:
-        show_login_form()
-    pass
-
+        # show_login_form()
+        return render_template("login.html")
 
 @app.route('/logout')
 def logout():
