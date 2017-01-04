@@ -8,7 +8,7 @@
 
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
 
     <title>{% block title %}{% endblock %} - YelpUs</title>
 
@@ -34,10 +34,10 @@
             <a class="site-nav-item site-brand" href="{{ url_for('index') }}">
                 <span class="glyphicon glyphicon-grain"></span> YelpUs</a>
 
-          <a class="site-nav-item {% if request.path == '/' %}active{% endif %}"
-             href="{{ url_for('index') }}">Home</a>
-          <a class="site-nav-item {% if request.path == '/about' %}active{% endif %}"
-             href="{{ url_for('about') }}">About</a>
+          <a class="site-nav-item navbar-right {% if request.path == '/login' %}active{% endif %}"
+             href="{{ url_for('login') }}">Login</a>
+{#          <a class="site-nav-item {% if request.path == '/about' %}active{% endif %}"#}
+{#             href="{{ url_for('about') }}">About</a>#}
         </nav>
       </div>
     </div>
@@ -49,7 +49,7 @@
     </div><!-- /.container -->
 
     <footer class="site-footer navbar-fixed-bottom">
-      <p>&copy; COMP6235 Foundations of Data Science - Group 11 </p>
+      <p>&copy; COMP6235 Foundations of Data Science - <a title="About" href="{{ url_for('about') }}">Group 11</a></p>
     </footer>
 
     <!-- Bootstrap core JavaScript
