@@ -17,6 +17,10 @@ def user():
     pass
 
 
+@app.route('/admin')
+def admin():
+    return render_template("admin.html")
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':

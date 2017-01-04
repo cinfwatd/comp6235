@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block title %}Index{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block navbarItems %}
+    <a class="site-nav-item {% if request.path == '/about' %}active{% endif %}"
+       href="{{ url_for('about') }}">About</a>
+{% endblock %}
+
+{% block content %}
+admin
+{% endblock %}

@@ -33,11 +33,10 @@
         <nav class="site-nav">
             <a class="site-nav-item site-brand" href="{{ url_for('index') }}">
                 <span class="glyphicon glyphicon-grain"></span> YelpUs</a>
-
+        {% block navbarItems %}
           <a class="site-nav-item navbar-right {% if request.path == '/login' %}active{% endif %}"
              href="{{ url_for('login') }}">Login</a>
-{#          <a class="site-nav-item {% if request.path == '/about' %}active{% endif %}"#}
-{#             href="{{ url_for('about') }}">About</a>#}
+        {% endblock %}
         </nav>
       </div>
     </div>
