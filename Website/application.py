@@ -26,9 +26,7 @@ def admin():
 def login():
     if request.method == 'POST':
         do_login()
-    else:
-        # show_login_form()
-        return render_template("login.html")
+
 
 @app.route('/logout')
 def logout():
@@ -38,10 +36,6 @@ def logout():
 
 
 def do_login():
-    pass
-
-
-def show_login_form():
     pass
 
 
