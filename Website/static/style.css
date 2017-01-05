@@ -201,6 +201,10 @@ h6, .h6 {
     margin-bottom: 20px;
     border: 1px solid #e2e2e2;
 }
+.marker-rating span{
+    padding: 2px;
+    color: #8a6d3b;
+}
 
 /* Footer */
 html {
