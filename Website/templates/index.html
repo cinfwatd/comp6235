@@ -1,9 +1,54 @@
 {% extends "layout.html" %}
-{% block title %}Index{% endblock %}
+{% block title %}Home{% endblock %}
 {% block head %}
     {{ super() }}
 {% endblock %}
 
+{% block scripts %}
+    {{ super() }}
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAPV7m3xJuLkXdEFXP1UAGV2-AcY9QJjU&callback=initMap">
+    </script>
+{% endblock %}
+
 {% block content %}
-holla guys
+    <div class="row">
+        <div class="site-header">
+{#            <h1 class="site-title">Personalised recommendations for Yelpers</h1>#}
+{#            <p class="lead site-description">Personalised recommendations for Yelpers.</p>#}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-8 site-main">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search for...">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" aria-label="Left Align" type="button">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                    </button>
+                </span>
+            </div><!-- /input-group -->
+
+            <div class="row">
+                <div id="map">
+                    jsljfls
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-3 col-sm-offset-1 site-sidebar">
+            <div class="sidebar-module sidebar-module-inset">
+                <h4>Filter</h4>
+            </div>
+
+            <div class="sidebar-module">
+                <h4>Topics</h4>
+                <ol class="list-unstyled">
+                    <li><a href="#">afsdafsdf  sdfsafsafs</a></li>
+                    <li><a href="#">sfs dfsf sadfsafs</a></li>
+                </ol>
+            </div>
+        </div>
+    </div>
 {% endblock %}
