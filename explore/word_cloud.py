@@ -124,12 +124,42 @@ def perform_similarity_query(query):
     index = similarities.SparseMatrixSimilarity.load("corpus_tfidf_index")
 
     sims = index[tfidf[query_vec]]
-    print(type(sims))
-    print(list(enumerate(sims)))
+    # print(type(sims))
+    # print(list(enumerate(sims)))
 
     # print(sims[2000])
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
-    print(sims[0:6])
+    # print(sims[0:6])
+
+    # reviews = {'id': '', 'r': [0, 0]}
+    restaurants = dict()
+    total_num = {}
+    total_den = {}
+    for review in sims[0:6]:
+        review_id = review[0]
+        cosine_sim = review[1]
+
+        db_review = db.vegas_reviews.find()[review_id]
+        business = db_review['business_id']
+        # num = 0
+        # den = 0
+        total_den.setdefault(business, 0)
+        total_num.setdefault(business, 0)
+
+        stars = db_review['stars']
+        num = stars * cosine_sim
+        den = cosine_sim
+
+        total_num[business] += num
+        total_den[business] += den
+
+    rankings = [(num_total / total_den[item], item) for item, num_total in total_num.items()]
+
+        # reviews['id'] = review_id
+        # reviews['id']['r'] = [1, 1]
+    # print(restaurants)
+
+
 
 
 def get_all_restaurant_names():
@@ -211,4 +241,5 @@ if __name__ == '__main__':
     # get_tfidf_transformation()
     # perform_similarity_query("burger dough fresh")
     # get_lda()
-    get_all_restaurant_names()
+    # get_all_restaurant_names()
+    perform_similarity_query("freshly knit dought")
