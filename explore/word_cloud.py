@@ -240,6 +240,42 @@ def get_restaurants_categories():
     # index.save('rest_tfidf_index')
 
 
+def get_user_lda_sims(user_id):
+    container = []
+    for review in db.vegas_reviews.find({'user_id': user_id}, {'tokens':1}):
+        container.append(review['tokens'])
+
+    np.save('current_user_reviews', container)
+    # print("Loading user reviews")
+    # reviews = np.load('current_user_reviews.npy')
+    reviews = container
+
+    print(len(container))
+
+    dictionary = corpora.Dictionary.load('reviews_word_dictionary.dict')
+
+    print("Word to vector ...")
+    user_review_corpus = [dictionary.doc2bow(rev) for rev in reviews]
+
+    print(len(user_review_corpus))
+
+    topic = {}
+    lda_model = models.LdaModel.load('corpus_lda_10')
+
+    for user_rev in user_review_corpus:
+        # print(user_rev)
+        lda_sims = lda_model[user_rev] #todo: replace with lda sim.
+        # break
+        for sim in lda_sims:
+            topic.setdefault(sim[0], 0)
+            topic[sim[0]] += sim[1]
+    # for review in container:
+    print(topic)
+
+    # print(db.vegas_reviews.find({'user_id': 'qL7Astun3i7qwr2IL5iowA'}).count())
+
+
+
 def get_lda():
     corpus = corpora.MmCorpus('reviews_bow.mm')
     dictionary = corpora.Dictionary.load('reviews_word_dictionary.dict')
@@ -272,7 +308,8 @@ if __name__ == '__main__':
     # #     print(count)
     # print(vegas_res.count())
     # get_corpus()
-    perform_similarity_query('pizza burger')
+    # perform_similarity_query('pizza burger')
+    get_user_lda_sims('utcN2FtmIymOprcfFS-Tfg')
     # get_tfidf_transformation()
     #perform_similarity_query("las vegas back family iphone nice")
     # get_lda()
