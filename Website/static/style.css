@@ -45,8 +45,8 @@ h6, .h6 {
 .site-nav-item {
   position: relative;
   display: inline-block;
-  padding: 10px;
-  font-weight: 500;
+  padding: 12px;
+  font-weight: 100;
   color: #cdddeb;
 }
 
@@ -196,8 +196,8 @@ h6, .h6 {
 
 /* Map */
 #map {
-    height: 500px;
-    margin-top: 20px;
+    height: 400px;
+    /*margin-top: 20px;*/
     margin-bottom: 20px;
     border: 1px solid #e2e2e2;
 }
@@ -214,6 +214,9 @@ html {
 body {
   /* Margin bottom by footer height */
   margin-bottom: 60px;
+    background-image: url('../static/background_image3.png');
+    width: 100%;
+
 }
 .footer {
   position: absolute;
@@ -221,4 +224,30 @@ body {
   width: 100%;
   /* Set the fixed height of the footer here */
   height: 60px;
+}
+
+.restaurants-container {
+    background-color: white;
+    padding: 10px;
+    margin-right: 10px;
+}
+
+.restaurant {
+    border-bottom: 1px solid #E0E0E0;
+}
+
+#restaurants-box {
+    margin-top: 20px;
+}
+
+.restaurant_icon {
+
+    height: 100px;
+    background-image: url('../static/restaurant_icon.jpg');
+
+    position: absolute;
+    top:0;
+
+
+    width: 20%;
 }
