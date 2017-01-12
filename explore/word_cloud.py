@@ -135,34 +135,50 @@ def perform_similarity_query(query):
     restaurants = dict()
     total_num = {}
     total_den = {}
-    for review in sims[0:6]:
+
+    reviews_star = np.load('reviews_star.npy')
+    count = 0
+    for review in sims:
         review_id = review[0]
         cosine_sim = review[1]
 
-        db_review = db.vegas_reviews.find()[review_id]
-        business = db_review['business_id']
+        # db_review = db.vegas_reviews.find()[review_id]
+        business = review[0]
         # num = 0
         # den = 0
         total_den.setdefault(business, 0)
         total_num.setdefault(business, 0)
 
-        stars = db_review['stars']
+        stars = reviews_star[business]
         num = stars * cosine_sim
         den = cosine_sim
 
         total_num[business] += num
         total_den[business] += den
+        count += 1
+        print(count)
 
     rankings = [(num_total / total_den[item], item) for item, num_total in total_num.items()]
+    print(rankings)
 
         # reviews['id'] = review_id
         # reviews['id']['r'] = [1, 1]
     # print(restaurants)
 
 
+def extract_reviews_star():
+    container = []
+    count = 0
+    for review in db.vegas_reviews.find():
+        container.append(review['stars'])
+
+        count += 1
+        print(count)
+    stars = np.array(container)
+    np.save('reviews_star.npy', stars)
 
 
-def get_all_restaurant_names():
+def get_all_restaurant_names(query):
     container = []
     for res in db.vegas_restaurants.find({}, {"name": 1}):
         container.append(clean(res['name']))
@@ -175,7 +191,7 @@ def get_all_restaurant_names():
     tfidf = models.TfidfModel(bow_corpus)
     index = similarities.SparseMatrixSimilarity(tfidf[bow_corpus], num_features=3246)
 
-    query_vec = rest_dict.doc2bow(clean("pizza hut"))
+    query_vec = rest_dict.doc2bow(clean(query))
 
     # names =set()
     # names.
@@ -237,9 +253,10 @@ if __name__ == '__main__':
     # #     print(count)
     # print(vegas_res.count())
     # get_corpus()
-    # perform_similarity_query('huge disappointment drive away las vegas delicious wanting friendly perfect spots trying pho kim hearing several trying meals winter favorite one craving get')
+    perform_similarity_query('huge disappointment drive away las vegas delicious wanting friendly perfect spots trying pho kim hearing several trying meals winter favorite one craving get')
     # get_tfidf_transformation()
     # perform_similarity_query("burger dough fresh")
     # get_lda()
     # get_all_restaurant_names()
-    perform_similarity_query("freshly knit dought")
+    # get_all_restaurant_names("pizza hut")
+    # extract_reviews_star()
