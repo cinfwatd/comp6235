@@ -141,6 +141,9 @@ def perform_similarity_query(query):
         review_id = review[0]
         cosine_sim = review[1]
 
+        if cosine_sim < 0.01:
+            continue
+
         # db_review = db.vegas_reviews.find()[review_id]
         business = review[0]
         # num = 0
@@ -157,8 +160,9 @@ def perform_similarity_query(query):
         count += 1
         print(count)
 
-    rankings = [(num_total / total_den[item], item) for item, num_total in total_num.items()]
-    print(rankings)
+    rankings = [(item, num_total / total_den[item]) for item, num_total in total_num.items()]
+    sorted_rankings = sorted(rankings, key=lambda item: -item[1])
+    print(sorted_rankings[0:30])
 
 
 
@@ -268,7 +272,7 @@ if __name__ == '__main__':
     # #     print(count)
     # print(vegas_res.count())
     # get_corpus()
-    perform_similarity_query('huge disappointment drive away las vegas delicious wanting friendly perfect spots trying pho kim hearing several trying meals winter favorite one craving get')
+    perform_similarity_query('pizza burger')
     # get_tfidf_transformation()
     #perform_similarity_query("las vegas back family iphone nice")
     # get_lda()
