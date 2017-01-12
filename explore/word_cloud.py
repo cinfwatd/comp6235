@@ -247,6 +247,20 @@ def get_lda():
     lda.save('corpus_lda_10')
     lda.print_topics()
 
+def get_user_LDAsim(query):
+    dictionary= corpora.Dictionary.load('reviews_word_dictionary.dict')
+    corpus = corpora.MmCorpus('reviews_bow.mm')
+    query_vec = dictionary.doc2bow(clean(query))
+    lda= models.LdaModel.load('corpus_lda_10')
+    # index = similarities.SparseMatrixSimilarity(lda[corpus],num_features=10)
+    # index.save('corpus_lda_index')
+    # index = similarities.SparseMatrixSimilarity.load("corpus_lda_index")
+    query_lda= lda[query_vec]
+    # sims= index[query_lda]
+    print(query_lda)
+
+
+
 def get_lsi():
     corpus = corpora.MmCorpus('reviews_bow.mm')
     dictionary = corpora.Dictionary.load('reviews_word_dictionary.dict')
@@ -272,8 +286,9 @@ if __name__ == '__main__':
     # #     print(count)
     # print(vegas_res.count())
     # get_corpus()
-    perform_similarity_query('pizza burger')
+    # perform_similarity_query('pizza burger')
     # get_tfidf_transformation()
+    get_user_LDAsim("chinese bar")
     #perform_similarity_query("las vegas back family iphone nice")
     # get_lda()
     # get_all_restaurant_names()
