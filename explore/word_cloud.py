@@ -17,6 +17,7 @@ import numpy as np
 
 client = MongoClient()
 db = client.yelp
+#print(db.collection_names())
 
 
 def get_word_frequencies(rating=None):
@@ -118,20 +119,18 @@ def perform_similarity_query(query):
     dictionary = corpora.Dictionary.load('reviews_word_dictionary.dict')
     query_vec = dictionary.doc2bow(clean(query))
     # print(query_vec)
-    #
+    # return
     tfidf = models.TfidfModel.load('reviews_tfidf_model.tfidf')
     # print(tfidf[query_vec])
     index = similarities.SparseMatrixSimilarity.load("corpus_tfidf_index")
 
     sims = index[tfidf[query_vec]]
-    # print(type(sims))
+    # print(sims[0:10])
     # print(list(enumerate(sims)))
 
     # print(sims[2000])
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
-    # print(sims[0:6])
-
-    # reviews = {'id': '', 'r': [0, 0]}
+    #print(sims[0:15])
     restaurants = dict()
     total_num = {}
     total_den = {}
@@ -161,9 +160,6 @@ def perform_similarity_query(query):
     rankings = [(num_total / total_den[item], item) for item, num_total in total_num.items()]
     print(rankings)
 
-        # reviews['id'] = review_id
-        # reviews['id']['r'] = [1, 1]
-    # print(restaurants)
 
 
 def extract_reviews_star():
@@ -194,12 +190,9 @@ def get_all_restaurant_names(query):
     query_vec = rest_dict.doc2bow(clean(query))
 
     # names =set()
-    # names.
-
     sims = index[tfidf[query_vec]]
     # print(type(sims))
     # print(list(enumerate(sims)))
-
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
     print(sims[0:6])
     # index.save('rest_tfidf_index')
@@ -211,14 +204,36 @@ def clean(value):
     :param value: Text input to clean
     :return: return list of tokens
     """
+
     return re.sub("[^a-zA-Z]", " ", value).lower().split()
 
 
-# def get_all_categories():
-#     container = []
-#     for cat in db.vegas_restaurants.find().distinct('categories'):
-#         container.append(list(re.sub("")))
+def get_all_categories():
+    container = []
+    #print(db.vegas_restaurants.find().distinct('categories'))
+    for cat in db.vegas_restaurants.find({},{'categories':1}):
+        # print(" ".join(cat['categories']))
+        #  container.append(list(re.sub("categories")))
+        container.append(clean(" ".join(cat['categories'])))
+        data= np.array(container)
+        #np.save('categories.npy',data)
 
+
+def get_restaurants_categories():
+    container= np.load('categories.npy')
+    categories_dict = corpora.Dictionary(container)
+    #print(len(categories_dict))
+    bow_corpus = [categories_dict.doc2bow(cat) for cat in container]
+    tfidf = models.TfidfModel(bow_corpus)
+    index = similarities.SparseMatrixSimilarity(tfidf[bow_corpus], num_features=236)
+    query_vec = categories_dict.doc2bow(clean("chinese bars"))
+    # print(query_vec)
+    sims = index[tfidf[query_vec]]
+    # print(type(sims))
+    # print(list(enumerate(sims)))
+    sims = sorted(enumerate(sims), key=lambda item: -item[1])
+    print(sims[0:6])
+    # index.save('rest_tfidf_index')
 
 
 def get_lda():
@@ -255,7 +270,7 @@ if __name__ == '__main__':
     # get_corpus()
     perform_similarity_query('huge disappointment drive away las vegas delicious wanting friendly perfect spots trying pho kim hearing several trying meals winter favorite one craving get')
     # get_tfidf_transformation()
-    # perform_similarity_query("burger dough fresh")
+    #perform_similarity_query("las vegas back family iphone nice")
     # get_lda()
     # get_all_restaurant_names()
     # get_all_restaurant_names("pizza hut")
