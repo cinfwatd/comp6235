@@ -1,2 +1,4 @@
 .DS_Store
 .idea/
+explore/*
+!explore/word_cloud.py
