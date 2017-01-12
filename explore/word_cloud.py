@@ -17,6 +17,7 @@ import numpy as np
 
 client = MongoClient()
 db = client.yelp
+#print(db.collection_names())
 
 
 def get_word_frequencies(rating=None):
@@ -91,6 +92,8 @@ def get_corpus_bow():
     print("Loading dictionary ...")
     dictionary = corpora.Dictionary.load('reviews_word_dictionary.dict')
 
+    print(dictionary)
+
     print("Loading reviews")
     reviews = np.load('reviews.npy')
 
@@ -99,7 +102,7 @@ def get_corpus_bow():
 
     print("Serialize vector")
     corpora.MmCorpus.serialize('reviews_bow.mm', corpus)  # store to disk
-    # print(corpus)
+    print(corpus)
 
 
 def get_tfidf_transformation():
@@ -118,21 +121,47 @@ def perform_similarity_query(query):
     dictionary = corpora.Dictionary.load('reviews_word_dictionary.dict')
     query_vec = dictionary.doc2bow(clean(query))
     # print(query_vec)
-    #
+    # return
     tfidf = models.TfidfModel.load('reviews_tfidf_model.tfidf')
     # print(tfidf[query_vec])
     index = similarities.SparseMatrixSimilarity.load("corpus_tfidf_index")
 
     sims = index[tfidf[query_vec]]
-    print(type(sims))
-    print(list(enumerate(sims)))
+    # print(sims[0:10])
+    # print(list(enumerate(sims)))
 
     # print(sims[2000])
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
-    print(sims[0:6])
+    #print(sims[0:15])
+    restaurants = dict()
+    total_num = {}
+    total_den = {}
+    for review in sims:
+        review_id = review[0]
+        cosine_sim = review[1]
+
+        db_review = db.vegas_reviews.find()[review_id]
+        business = db_review['business_id']
+        #print(business)
+        #num = 0
+        # den = 0
+        total_den.setdefault(business, 0)
+        total_num.setdefault(business, 0)
+
+        stars = db_review['stars']
+        num = stars * cosine_sim
+        den = cosine_sim
+
+        total_num[business] += num
+        total_den[business] += den
+    rankings = [(num_total / total_den[item], item) for item, num_total in total_num.items()]
+    print(len(rankings))
 
 
-def get_all_restaurant_names():
+
+
+
+def get_all_restaurant_names(query):
     container = []
     for res in db.vegas_restaurants.find({}, {"name": 1}):
         container.append(clean(res['name']))
@@ -145,15 +174,12 @@ def get_all_restaurant_names():
     tfidf = models.TfidfModel(bow_corpus)
     index = similarities.SparseMatrixSimilarity(tfidf[bow_corpus], num_features=3246)
 
-    query_vec = rest_dict.doc2bow(clean("pizza hut"))
+    query_vec = rest_dict.doc2bow(clean(query))
 
     # names =set()
-    # names.
-
     sims = index[tfidf[query_vec]]
     # print(type(sims))
     # print(list(enumerate(sims)))
-
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
     print(sims[0:6])
     # index.save('rest_tfidf_index')
@@ -165,14 +191,36 @@ def clean(value):
     :param value: Text input to clean
     :return: return list of tokens
     """
+
     return re.sub("[^a-zA-Z]", " ", value).lower().split()
 
 
-# def get_all_categories():
-#     container = []
-#     for cat in db.vegas_restaurants.find().distinct('categories'):
-#         container.append(list(re.sub("")))
+def get_all_categories():
+    container = []
+    #print(db.vegas_restaurants.find().distinct('categories'))
+    for cat in db.vegas_restaurants.find({},{'categories':1}):
+        # print(" ".join(cat['categories']))
+        #  container.append(list(re.sub("categories")))
+        container.append(clean(" ".join(cat['categories'])))
+        data= np.array(container)
+        #np.save('categories.npy',data)
 
+
+def get_restaurants_categories():
+    container= np.load('categories.npy')
+    categories_dict = corpora.Dictionary(container)
+    #print(len(categories_dict))
+    bow_corpus = [categories_dict.doc2bow(cat) for cat in container]
+    tfidf = models.TfidfModel(bow_corpus)
+    index = similarities.SparseMatrixSimilarity(tfidf[bow_corpus], num_features=236)
+    query_vec = categories_dict.doc2bow(clean("chinese bars"))
+    # print(query_vec)
+    sims = index[tfidf[query_vec]]
+    # print(type(sims))
+    # print(list(enumerate(sims)))
+    sims = sorted(enumerate(sims), key=lambda item: -item[1])
+    print(sims[0:6])
+    # index.save('rest_tfidf_index')
 
 
 def get_lda():
@@ -209,6 +257,12 @@ if __name__ == '__main__':
     # get_corpus()
     # perform_similarity_query('huge disappointment drive away las vegas delicious wanting friendly perfect spots trying pho kim hearing several trying meals winter favorite one craving get')
     # get_tfidf_transformation()
-    # perform_similarity_query("burger dough fresh")
+    #perform_similarity_query("las vegas back family iphone nice")
     # get_lda()
-    get_all_restaurant_names()
+    # get_corpus_bow()
+    #get_all_restaurant_names("pizz hut")
+    #get_all_categories()
+    get_restaurants_categories()
+
+
+
