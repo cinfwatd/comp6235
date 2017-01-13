@@ -66,7 +66,7 @@ def logout():
 
 
 def do_login():
-    pass
+    return redirect(url_for('/'))
 
 
 @app.errorhandler(404)
