@@ -102,25 +102,42 @@ $(document).ready(function(){
 
                 var rating = document.createElement('div');
                 rating.setAttribute('class', 'marker-rating');
-                for(var i in [1, 2, 3, 4, 5]) {
 
-                    if(i < 4) {
-                        var star = document.createElement('span');
-                        star.setAttribute('class', 'glyphicon glyphicon-star');
-                        star.setAttribute('aria-hiden', 'true');
-                        rating.appendChild(star)
-                    } else {
-                        var emptyStar = document.createElement('span');
-                        emptyStar.setAttribute('class', 'glyphicon glyphicon-star-empty');
-                        emptyStar.setAttribute('aria-hiden', 'true');
-                        rating.appendChild(emptyStar)
-                    }
+                var star1 = document.createElement('i');
+                star1.setAttribute('class', 'fa fa-star');
+                //
+                // var star0 = document.createElement('i');
+                // star0.setAttribute('class', 'fa fa-star-o');
+                //
+                // var star_1_2 = document.createElement('i');
+                // star_1_2.setAttribute('class', 'fa fa-star-half-o');
 
-                }
+
+                // for(var i in [1, 2, 3, 4, 5]) {
+                //
+                //     if(i < 4) {
+                //         var star = document.createElement('i');
+                //         star.setAttribute('class', 'fa fa-star');
+                //         star.setAttribute('aria-hidden', 'true');
+                //         rating.appendChild(star)
+                //     } else {
+                //         var emptyStar = document.createElement('i');
+                //         // emptyStar.setAttribute('class', 'glyphicon glyphicon-star-empty');
+                //         emptyStar.setAttribute('class', 'fa fa-star-o');
+                //         emptyStar.setAttribute('aria-hidden', 'true');
+                //         rating.appendChild(emptyStar)
+                //     }
+                //
+                // }
 
                 infowincontent.appendChild(document.createElement('br'));
-                infowincontent.appendChild(rating);
+                var star_desc = document.createElement('span');
+                var star_text = document.createElement('text');
+                star_text.textContent = markerElem['stars'] + ' ';
 
+                star_desc.appendChild(star_text);
+                star_desc.appendChild(star1);
+                infowincontent.appendChild(star_desc);
 
                var restaurant = document.createElement('div');
                restaurant.setAttribute('class', 'restaurant');
@@ -143,7 +160,7 @@ $(document).ready(function(){
                var inner_container2 = document.createElement('div');
                inner_container2.setAttribute('class', 'container restaurant-stars ');
 
-               inner_container2.appendChild(rating);
+               inner_container2.appendChild(star_desc);
 
                var strong = document.createElement('strong');
                strong.textContent = name;
