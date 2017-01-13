@@ -140,7 +140,7 @@ def perform_similarity_query(query):
         business = review[0]
         cosine_sim = review[1]
 
-        if cosine_sim < 0.1:
+        if cosine_sim < 0.05:
             continue
 
         # print(db.vegas_reviews[business]['text'])
@@ -170,7 +170,7 @@ def perform_similarity_query(query):
     pref_topic_normalised = [(item, num_total / pref_topic_count_no[item]) for item, num_total in pref_topic_no.items()]
     rankings = [(item, num_total / total_den[item]) for item, num_total in total_num.items()]
     sorted_rankings = sorted(rankings, key=lambda item: -item[1])
-    c= round(len(rankings) * 0.25)
+    c= round(len(rankings) * 0.9)
     del sorted_rankings[c:len(sorted_rankings)]
     sorted_rankings_dic={}
     for i in sorted_rankings:
@@ -354,13 +354,31 @@ def get_recommendation(query):
     r_bar, ldaSim = perform_similarity_query(query)
     nameSim= get_all_restaurant_names(query)
     categorySim= get_restaurants_categories(query)
+    key_a= r_bar.keys()
+    key_b = ldaSim.keys()
+    intersect_list_ab = key_a & key_b
+    key_c = nameSim.keys()
+    key_d = categorySim.keys()
+    intersect_list_cd= key_c & key_d
+    intersect_list = []
+    for i in intersect_list_ab:
+        for j in intersect_list_cd:
+            if i == j:
+                intersect_list.append(i)
+    # business_dic = dict(intersect_list)
+    print(intersect_list)
+    # for i in intersect_list:
+    #     business_dic[i[0]] = int([0]
 
+    recommendation = [(business,(( (r_bar[business]/5)+ ldaSim[business] + nameSim[business]+ categorySim[business]) /4)) for business in intersect_list]
+    sorted_recommednation = sorted(recommendation, key=lambda item: -item[1])
+    print(sorted_recommednation)
+    # recommendation={}
+    # for i in intersect_list:
 
-
-    print(len(key_a), len(key_b), len(key_c), len(key_d))
-
-    # print(list(key_a))
-    # print(key_b)
+    #     recommendation.setdefault(i,0)
+    #     recommendation[i]= ((r_bar[i]/5)+ldaSim(i))/2
+    # print(recommendation)
 
     # restaurants = set()
     # restaurants.
@@ -423,7 +441,7 @@ if __name__ == '__main__':
     # get_all_restaurant_names()
     # get_all_restaurant_names("pizza hut")
     # extract_reviews_star()
-     get_recommendation("las vegas back family iphone nice")
+     get_recommendation("Find me the best chinese food in southamton ")
     # get_restaurants_categories("chineses")
 
 
