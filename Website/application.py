@@ -1,10 +1,14 @@
 from pymongo import MongoClient
-from flask import Flask, session, redirect, url_for, escape, request, render_template, abort
+from flask import Flask, session, redirect, url_for, escape, request, render_template, abort, g
 app = Flask(__name__)
 
 client = MongoClient()
 db = client.yelp
-#print(db.collection_names())
+# print(db.collection_names())
+
+# class User():
+#     _tablename_ = "users"
+#     username = db.Column('user_id', db.String(30), unique=True)
 
 
 def get_latitude(business_id):
@@ -57,6 +61,14 @@ def login():
     if request.method == 'POST':
         return redirect('/')
     return render_template('login.html')
+    # if request.method == 'GET':
+    #     return render_template('login.html')
+    # username = request.form['user_id']
+    # registered = User.query.filter_by(user_id=username).first()
+    # if registered is None:
+    #     flash('Invalid username', 'error')
+    #     return render_template('login.html')
+    # return redirect('/')
 
 
 @app.route('/logout')

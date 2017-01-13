@@ -8,7 +8,7 @@ db = client.yelp
 def insert_data(collection_name):
     """Inserts yelp data from the specified file into the respective collection."""
 
-    file_name = 'data/yelp_academic_dataset_%s.json' % collection_name
+    file_name = '../../../comp6235/DataLoader/vegas_%s.json' % collection_name
     collection = db[collection_name]
 
     with open(file_name, 'r') as data:
@@ -34,4 +34,4 @@ def insert_data(collection_name):
             container.clear()
 
 
-insert_data("review")
+insert_data("reviews")
