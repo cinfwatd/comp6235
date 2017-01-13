@@ -36,7 +36,11 @@
         {% block navbarItems %}
             {% if request.path != '/login' %}
           <div class="site-nav-item navbar-right">
-            <span class="site-nav-item" style="color: white">Welcome Tom</span>  <a class="site-nav-item" href="{{ url_for('logout') }}">Logout</a>
+            <span class="site-nav-item" style="color: white">Welcome, {% if username is defined %}
+                {{ username }}
+                    {% else %}
+                    Guest
+                {% endif %}</span>  <a class="site-nav-item" href="{{ url_for('logout') }}">Logout</a>
           </div>
             {% endif %}
         {% endblock %}

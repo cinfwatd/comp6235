@@ -15,7 +15,7 @@ $(document).ready(function(){
 
     function initMap() {
         var map = new google.maps.Map(document.getElementById('map'), {
-            center: new google.maps.LatLng(-33.863276, 151.207977),
+            center: new google.maps.LatLng(36.1699, 115.1398),
             zoom: 12
         });
         var infoWindow = new google.maps.InfoWindow;
@@ -94,8 +94,8 @@ $(document).ready(function(){
         request.send(null);
     }
 
-    function doNothing() {}
-    initMap()
+    // function doNothing() {}
+    // initMap()
 
     var loader = $('.loading');
 
@@ -119,14 +119,73 @@ $(document).ready(function(){
         beforeSend: function(){
             loader.show();
         },
-          // dataType: "json"
+          dataType: "json"
         });
 
         request.done(function( msg ) {
           // $( "#log" ).html( msg );
             loader.hide();
-            query.val('');
-            console.log(msg)
+            $('#query').val('');
+            // console.log(msg)
+
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: new google.maps.LatLng(36.1699, -115.1398),
+                zoom: 10
+            });
+            var infoWindow = new google.maps.InfoWindow;
+
+
+            msg.forEach(function(markerElem) {
+                var name = markerElem['name'];
+                var address = markerElem['full_address'];
+                // var type = markerElem.getAttribute('type');
+                var point = new google.maps.LatLng(
+                  parseFloat(markerElem['latitude']),
+                  parseFloat(markerElem['longitude']));
+
+                var infowincontent = document.createElement('div');
+                var strong = document.createElement('strong');
+                strong.textContent = name;
+                infowincontent.appendChild(strong);
+                infowincontent.appendChild(document.createElement('br'));
+
+                var text = document.createElement('text');
+                text.textContent = address;
+                infowincontent.appendChild(text);
+
+                var rating = document.createElement('div');
+                rating.setAttribute('class', 'marker-rating');
+                for(var i in [1, 2, 3, 4, 5]) {
+
+                    if(i < 4) {
+                        var star = document.createElement('span');
+                        star.setAttribute('class', 'glyphicon glyphicon-star');
+                        star.setAttribute('aria-hiden', 'true');
+                        rating.appendChild(star)
+                    } else {
+                        var emptyStar = document.createElement('span');
+                        emptyStar.setAttribute('class', 'glyphicon glyphicon-star-empty');
+                        emptyStar.setAttribute('aria-hiden', 'true');
+                        rating.appendChild(emptyStar)
+                    }
+
+                }
+
+                infowincontent.appendChild(document.createElement('br'));
+                infowincontent.appendChild(rating);
+
+
+                var icon = customLabel[0] || {};
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: point,
+                    label: icon.label
+                });
+                marker.addListener('click', function() {
+                    infoWindow.setContent(infowincontent);
+                    infoWindow.open(map, marker);
+                });
+            });
         });
 
         request.fail(function( jqXHR, textStatus ) {

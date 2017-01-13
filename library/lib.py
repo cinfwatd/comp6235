@@ -368,8 +368,9 @@ def get_recommendation(query):
     #     business_dic[i[0]] = int([0]
 
     recommendation = [(business,(( (r_bar[business]/5)+ ldaSim[business] + nameSim[business]+ categorySim[business]) /4)) for business in intersect_list]
-    sorted_recommednation = sorted(recommendation, key=lambda item: -item[1])
-    print(sorted_recommednation)
+    sorted_recommendation = sorted(recommendation, key=lambda item: -item[1])
+    return sorted_recommendation
+    # print(sorted_recommednation)
     # recommendation={}
     # for i in intersect_list:
 
