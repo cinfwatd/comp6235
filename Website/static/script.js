@@ -13,90 +13,6 @@ $(document).ready(function(){
         }
     };
 
-    function initMap() {
-        var map = new google.maps.Map(document.getElementById('map'), {
-            center: new google.maps.LatLng(36.1699, 115.1398),
-            zoom: 12
-        });
-        var infoWindow = new google.maps.InfoWindow;
-
-          // Change this depending on the name of your server or XML file
-        downloadUrl('https://storage.googleapis.com/mapsdevsite/json/mapmarkers2.xml', function(data) {
-            var xml = data.responseXML;
-            var markers = xml.documentElement.getElementsByTagName('marker');
-            Array.prototype.forEach.call(markers, function(markerElem) {
-                var name = markerElem.getAttribute('name');
-                var address = markerElem.getAttribute('address');
-                var type = markerElem.getAttribute('type');
-                var point = new google.maps.LatLng(
-                  parseFloat(markerElem.getAttribute('lat')),
-                  parseFloat(markerElem.getAttribute('lng')));
-
-                var infowincontent = document.createElement('div');
-                var strong = document.createElement('strong');
-                strong.textContent = name;
-                infowincontent.appendChild(strong);
-                infowincontent.appendChild(document.createElement('br'));
-
-                var text = document.createElement('text');
-                text.textContent = address;
-                infowincontent.appendChild(text);
-
-                var rating = document.createElement('div');
-                rating.setAttribute('class', 'marker-rating');
-                for(var i in [1, 2, 3, 4, 5]) {
-
-                    if(i < 4) {
-                        var star = document.createElement('span');
-                        star.setAttribute('class', 'glyphicon glyphicon-star');
-                        star.setAttribute('aria-hiden', 'true');
-                        rating.appendChild(star)
-                    } else {
-                        var emptyStar = document.createElement('span');
-                        emptyStar.setAttribute('class', 'glyphicon glyphicon-star-empty');
-                        emptyStar.setAttribute('aria-hiden', 'true');
-                        rating.appendChild(emptyStar)
-                    }
-
-                }
-
-                infowincontent.appendChild(document.createElement('br'));
-                infowincontent.appendChild(rating);
-
-
-                var icon = customLabel[type] || {};
-                var marker = new google.maps.Marker({
-                    map: map,
-                    position: point,
-                    label: icon.label
-                });
-                marker.addListener('click', function() {
-                    infoWindow.setContent(infowincontent);
-                    infoWindow.open(map, marker);
-                });
-            });
-        });
-    }
-
-    function downloadUrl(url, callback) {
-        var request = window.ActiveXObject ?
-            new ActiveXObject('Microsoft.XMLHTTP') :
-            new XMLHttpRequest;
-
-        request.onreadystatechange = function() {
-            if (request.readyState == 4) {
-                request.onreadystatechange = doNothing;
-                callback(request, request.status);
-            }
-        };
-
-        request.open('GET', url, true);
-        request.send(null);
-    }
-
-    // function doNothing() {}
-    // initMap()
-
     var loader = $('.loading');
 
     loader.hide();
@@ -135,9 +51,40 @@ $(document).ready(function(){
             var infoWindow = new google.maps.InfoWindow;
 
 
+           // container = $('restaurants-container');
+            var outer = document.getElementById('restaurants-container');
+
+
+            // <div class="restaurant">
+            //             <div class="row">
+            //                 <div class="col-sm-4">
+            //                     <div class="row">
+            //                         <div class="container">
+            //                             <strong>Young Henry's</strong>
+            //                         </div>
+            //                     </div>
+            //                     <div class="row">
+            //                         <div class="container restaurant-stars">
+            //                             <span class="glyphicon glyphicon-star-empty"></span>
+            //                             <span class="glyphicon glyphicon-star-empty"></span>
+            //                             <span class="glyphicon glyphicon-star-empty"></span>
+            //                             <span class="glyphicon glyphicon-star-empty"></span>
+            //                             <span class="glyphicon glyphicon-star-empty"></span>
+            //                         </div>
+            //                     </div>
+            //                 </div>
+            //
+            //                 <div class="col-sm-8">
+            //                     Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean
+            // lacinia bibendum nulla
+            //                 </div>
+            //             </div>
+            //         </div>
+
+
             msg.forEach(function(markerElem) {
                 var name = markerElem['name'];
-                var address = markerElem['full_address'];
+                var address = markerElem['address'];
                 // var type = markerElem.getAttribute('type');
                 var point = new google.maps.LatLng(
                   parseFloat(markerElem['latitude']),
@@ -173,6 +120,60 @@ $(document).ready(function(){
 
                 infowincontent.appendChild(document.createElement('br'));
                 infowincontent.appendChild(rating);
+
+
+               var restaurant = document.createElement('div');
+               restaurant.setAttribute('class', 'restaurant');
+
+               var row = document.createElement('div');
+               row.setAttribute('class', 'row');
+
+               var col_sm4 = document.createElement('div');
+               col_sm4.setAttribute('class', 'col-sm-4');
+
+               var inner_row = document.createElement('div');
+               inner_row.setAttribute('class', 'row');
+
+               var inner_row2 = document.createElement('div');
+               inner_row2.setAttribute('class', 'row');
+
+               var inner_container = document.createElement('div');
+               inner_container.setAttribute('class', 'container');
+
+               var inner_container2 = document.createElement('div');
+               inner_container2.setAttribute('class', 'container restaurant-stars ');
+
+               inner_container2.appendChild(rating);
+
+               var strong = document.createElement('strong');
+               strong.textContent = name;
+
+               var col_sm8 = document.createElement('div');
+               col_sm8.setAttribute('class', 'col-sm-8');
+
+               var res_address = document.createElement('text');
+               res_address.textContent = address;
+
+
+           // restaurant.appendChild()
+           //  inner_container.appendChild(document.createElement)
+           //  inner_row.appendChild(inner_container);
+
+            inner_container.appendChild(strong);
+            inner_row.appendChild(inner_container);
+            col_sm4.appendChild(inner_row);
+
+            inner_row2.appendChild(inner_container2);
+            col_sm4.appendChild(inner_row2);
+            row.appendChild(col_sm4);
+
+            col_sm8.appendChild(res_address);
+            row.appendChild(col_sm8);
+            restaurant.appendChild(row);
+
+            outer.appendChild(restaurant);
+
+
 
 
                 var icon = customLabel[0] || {};
