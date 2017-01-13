@@ -45,8 +45,8 @@ h6, .h6 {
 .site-nav-item {
   position: relative;
   display: inline-block;
-  padding: 10px;
-  font-weight: 500;
+  padding: 12px;
+  font-weight: 100;
   color: #cdddeb;
 }
 
@@ -196,8 +196,8 @@ h6, .h6 {
 
 /* Map */
 #map {
-    height: 500px;
-    margin-top: 20px;
+    height: 400px;
+    /*margin-top: 20px;*/
     margin-bottom: 20px;
     border: 1px solid #e2e2e2;
 }
@@ -214,6 +214,9 @@ html {
 body {
   /* Margin bottom by footer height */
   margin-bottom: 60px;
+    background-image: url('../static/background_image3.png');
+    width: 100%;
+
 }
 .footer {
   position: absolute;
@@ -221,4 +224,71 @@ body {
   width: 100%;
   /* Set the fixed height of the footer here */
   height: 60px;
+}
+
+.restaurants-container {
+    background-color: white;
+    padding: 10px;
+    margin-right: 10px;
+}
+
+.restaurant {
+    border-bottom: 1px solid #E0E0E0;
+}
+
+#restaurants-box {
+    margin-top: 20px;
+}
+
+.restaurant_icon {
+
+    height: 100px;
+    background-image: url('../static/restaurant_icon.jpg');
+
+    position: absolute;
+    top:0;
+
+
+    width: 20%;
+}
+
+#about {
+    margin-top: 20px;
+    background-color: white;
+    padding: 20px;
+}
+
+#login-form {
+    margin-top: 20px;
+    background-color: white;
+}
+
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+  margin-bottom: 10px;
+}
+.form-signin .checkbox {
+  font-weight: normal;
+}
+.form-signin .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px;
+}
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+.form-signin input[type="text"] {
+  margin-bottom: 5px;
+  border-bottom-right-radius: 0;
+  /*border-bottom-left-radius: 0;*/
 }
