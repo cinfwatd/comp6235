@@ -34,32 +34,9 @@
             <a class="site-nav-item site-brand" href="{{ url_for('index') }}">
                 <span class="glyphicon glyphicon- glyphicon-grain"></span> <span class="site-brand-title">YelpUs</span></a>
         {% block navbarItems %}
-{#          <a class="site-nav-item navbar-right {% if request.path == '/login' %}active{% endif %}"#}
-{#             href="{{ url_for('login') }}">Login</a>#}
-            <li class="site-nav-item navbar-right dropdown">
-              <a href="#" class="dropdown-toggle site-nav-item" data-toggle="dropdown" role="button" aria-haspopup="true"
-                 aria-expanded="false">Login <span class="caret"></span></a>
-              <ul class="dropdown-menu" style="padding: 15px;min-width: 250px;">
-                <li>
-                    <div class="row">
-                          <div class="col-md-12">
-                             <form class="form" role="form" method="post" action="login" accept-charset="UTF-8" id="login-nav">
-                                <div class="form-group">
-                                   <label class="sr-only" for="userId">User Id</label>
-                                   <input type="text" class="form-control" id="userId" placeholder="User Id" required>
-                                </div>
-
-                                <div class="form-group">
-                                   <button type="submit" class="btn btn-success btn-block">Sign in</button>
-                                </div>
-                             </form>
-                          </div>
-                       </div>
-
-                </li>
-
-              </ul>
-            </li>
+          <div class="site-nav-item navbar-right">
+            <span class="site-nav-item" style="color: white">Welcome Tom</span>  <a class="site-nav-item" href="{{ url_for('logout') }}">Logout</a>
+          </div>
         {% endblock %}
         </nav>
       </div>

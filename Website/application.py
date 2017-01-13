@@ -53,8 +53,9 @@ def admin():
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
-    if request.method == 'POST':
-        do_login()
+    # if request.method == 'POST':
+    #     do_login()
+    return render_template('login.html')
 
 
 @app.route('/logout')
