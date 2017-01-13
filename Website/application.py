@@ -1,10 +1,6 @@
 from pymongo import MongoClient
-<<<<<<< HEAD
-from flask import Flask, session, redirect, url_for, escape, request, render_template, abort, g
-=======
 from flask import Flask, session, redirect, url_for, escape, request, render_template, abort
 from library import lib
->>>>>>> 3c3368e6106baab57a830074ec52d388d81e26d1
 app = Flask(__name__)
 
 client = MongoClient()
