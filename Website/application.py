@@ -32,6 +32,7 @@ print(get_latitude('m5hMJ7SPIK7are8SykvlvA'))
 
 
 @app.route('/')
+@app.route('/index')
 def index():
     return render_template("index.html")
 
@@ -53,8 +54,8 @@ def admin():
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
-    # if request.method == 'POST':
-    #     do_login()
+    if request.method == 'POST':
+        return redirect('/')
     return render_template('login.html')
 
 
@@ -63,10 +64,6 @@ def logout():
     # remove the username from the session
     session.pop('username', None)
     return redirect(url_for('login'))
-
-
-def do_login():
-    return redirect(url_for('/'))
 
 
 @app.errorhandler(404)
