@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from collections import Counter
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
+import operator
 
 import re
 
@@ -105,49 +106,54 @@ def get_corpus_bow():
 
 def get_tfidf_transformation():
     corpus = corpora.MmCorpus('reviews_bow.mm')
-
     tfidf = models.TfidfModel(corpus)
-
     # print(tfidf)
     tfidf.save('reviews_tfidf_model.tfidf')
     index = similarities.SparseMatrixSimilarity(tfidf[corpus], num_features=45063)
-
     index.save('corpus_tfidf_index')
 
 
 def perform_similarity_query(query):
     dictionary = corpora.Dictionary.load('tmp/reviews_word_dictionary.dict')
     query_vec = dictionary.doc2bow(clean(query))
-    # print(query_vec)
-    # return
     tfidf = models.TfidfModel.load('tmp/reviews_tfidf_model.tfidf')
     # print(tfidf[query_vec])
     index = similarities.SparseMatrixSimilarity.load("corpus_tfidf_index")
-
     sims = index[tfidf[query_vec]]
+    lda = models.LdaModel.load('tmp/corpus_lda_10')
     # print(sims[0:10])
     # print(list(enumerate(sims)))
-
-    # print(sims[2000])
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
-    #print(sims[0:15])
-    restaurants = dict()
+    # print(sims[0:15])
     total_num = {}
     total_den = {}
 
     reviews_star = np.load('tmp/reviews_star.npy')
+    reviews_corpus = corpora.MmCorpus('reviews_bow.mm')
+
     count = 0
+    pref_topic = {}
+    pref_topic_count = {}
+    pref_topic_index = 7 #get_user_lda_sims('sdfsdfsfsdfdsfsdf')
+
     for review in sims:
-        review_id = review[0]
+        business = review[0]
         cosine_sim = review[1]
 
-        if cosine_sim < 0.01:
+        if cosine_sim < 0.05:
             continue
 
-        # db_review = db.vegas_reviews.find()[review_id]
-        business = review[0]
-        # num = 0
-        # den = 0
+        # print(db.vegas_reviews[business]['text'])
+        busRev_vec= reviews_corpus[business]
+        bus_rev_lda_topics= lda[busRev_vec]
+        pref_topic.setdefault(business, 0)
+        pref_topic_count.setdefault(business, 0)
+
+        for bus_rev_lda in bus_rev_lda_topics:
+            if bus_rev_lda[0] == pref_topic_index:
+                business_indx= business
+                pref_topic[business_indx] += bus_rev_lda[1]
+                pref_topic_count[business_indx] += 1
         total_den.setdefault(business, 0)
         total_num.setdefault(business, 0)
 
@@ -157,12 +163,23 @@ def perform_similarity_query(query):
 
         total_num[business] += num
         total_den[business] += den
-        count += 1
-        print(count)
-
+        # count += 1
+        # print(count)
+    pref_topic_count_no = {k: v for k, v in pref_topic_count.items() if v!=0}
+    pref_topic_no= {k: v for k, v in pref_topic.items() if v!=0}
+    pref_topic_normalised = [(item, num_total / pref_topic_count_no[item]) for item, num_total in pref_topic_no.items()]
     rankings = [(item, num_total / total_den[item]) for item, num_total in total_num.items()]
     sorted_rankings = sorted(rankings, key=lambda item: -item[1])
-    print(sorted_rankings[0:30])
+    c= round(len(rankings) * 0.9)
+    del sorted_rankings[c:len(sorted_rankings)]
+    sorted_rankings_dic={}
+    for i in sorted_rankings:
+        sorted_rankings_dic[i[0]]= i[1]
+    pref_topic_normalised_dic={}
+    for i in pref_topic_normalised:
+        pref_topic_normalised_dic[i[0]]=i[1]
+    print(len(pref_topic_normalised_dic),len(sorted_rankings_dic))
+    return sorted_rankings_dic, pref_topic_normalised_dic
 
 
 
@@ -190,16 +207,17 @@ def get_all_restaurant_names(query):
 
     tfidf = models.TfidfModel(bow_corpus)
     index = similarities.SparseMatrixSimilarity(tfidf[bow_corpus], num_features=3246)
-
     query_vec = rest_dict.doc2bow(clean(query))
-
     # names =set()
     sims = index[tfidf[query_vec]]
     # print(type(sims))
     # print(list(enumerate(sims)))
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
-    print(sims[0:6])
     # index.save('rest_tfidf_index')
+    nameSims = {}
+    for i in sims:
+        nameSims[i[0]] = i[1]
+    return nameSims
 
 
 def clean(value):
@@ -223,21 +241,23 @@ def get_all_categories():
         #np.save('categories.npy',data)
 
 
-def get_restaurants_categories():
+def get_restaurants_categories(query):
     container= np.load('tmp/categories.npy')
     categories_dict = corpora.Dictionary(container)
     #print(len(categories_dict))
     bow_corpus = [categories_dict.doc2bow(cat) for cat in container]
     tfidf = models.TfidfModel(bow_corpus)
     index = similarities.SparseMatrixSimilarity(tfidf[bow_corpus], num_features=236)
-    query_vec = categories_dict.doc2bow(clean("chinese bars"))
+    query_vec = categories_dict.doc2bow(clean(query))
     # print(query_vec)
     sims = index[tfidf[query_vec]]
     # print(type(sims))
     # print(list(enumerate(sims)))
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
-    print(sims[0:6])
-    # index.save('rest_tfidf_index')
+    categorySims={}
+    for i in sims:
+        categorySims[i[0]]= i[1]
+    return categorySims
 
 
 def get_user_lda_sims(user_id):
@@ -248,17 +268,13 @@ def get_user_lda_sims(user_id):
     # np.save('current_user_reviews', container)
     # print("Loading user reviews")
     reviews = np.load('tmp/current_user_reviews.npy')
-    reviews = container
-
-    print(len(container))
-
     dictionary = corpora.Dictionary.load('tmp/reviews_word_dictionary.dict')
-
-    print("Word to vector ...")
+    #
+    # print("Word to vector ...")
     user_review_corpus = [dictionary.doc2bow(rev) for rev in reviews]
-
-    print(len(user_review_corpus))
-
+    #
+    # print(len(user_review_corpus))
+    #
     topic = {}
     lda_model = models.LdaModel.load('tmp/corpus_lda_10')
 
@@ -269,8 +285,44 @@ def get_user_lda_sims(user_id):
         for sim in lda_sims:
             topic.setdefault(sim[0], 0)
             topic[sim[0]] += sim[1]
-    # for review in container:
-    print(topic)
+    m=max(topic.items(), key=operator.itemgetter(1))[0]
+    print(m)
+    return m
+
+    # print(db.vegas_reviews.find({'user_id': 'qL7Astun3i7qwr2IL5iowA'}).count())
+
+
+# def get_user_lda_sims(user_id):
+#     container = []
+#     for review in db.vegas_reviews.find({'user_id': user_id}, {'tokens':1}):
+#         container.append(review['tokens'])
+#
+#     np.save('current_user_reviews', container)
+#     # print("Loading user reviews")
+#     # reviews = np.load('tmp/current_user_reviews.npy')
+#     reviews = container
+#
+#     print(len(container))
+#
+#     dictionary = corpora.Dictionary.load('tmp/reviews_word_dictionary.dict')
+#
+#     print("Word to vector ...")
+#     user_review_corpus = [dictionary.doc2bow(rev) for rev in reviews]
+#
+#     print(len(user_review_corpus))
+#
+#     topic = {}
+#     lda_model = models.LdaModel.load('tmp/corpus_lda_10')
+#
+#     for user_rev in user_review_corpus:
+#         # print(user_rev)
+#         lda_sims = lda_model[user_rev] #todo: replace with lda sim.
+#         # break
+#         for sim in lda_sims:
+#             topic.setdefault(sim[0], 0)
+#             topic[sim[0]] += sim[1]
+#     # for review in container:
+#     print(topic)
 
     # print(db.vegas_reviews.find({'user_id': 'qL7Astun3i7qwr2IL5iowA'}).count())
 
@@ -294,6 +346,56 @@ def get_user_LDAsim(query):
     query_lda= lda[query_vec]
     # sims= index[query_lda]
     print(query_lda)
+
+def get_recommendation(query):
+    r_bar, ldaSim = perform_similarity_query(query)
+    nameSim= get_all_restaurant_names(query)
+    categorySim= get_restaurants_categories(query)
+    key_a= r_bar.keys()
+    key_b = ldaSim.keys()
+    intersect_list_ab = key_a & key_b
+    key_c = nameSim.keys()
+    key_d = categorySim.keys()
+    intersect_list_cd= key_c & key_d
+    intersect_list = []
+    for i in intersect_list_ab:
+        for j in intersect_list_cd:
+            if i == j:
+                intersect_list.append(i)
+    # business_dic = dict(intersect_list)
+    print(intersect_list)
+    # for i in intersect_list:
+    #     business_dic[i[0]] = int([0]
+
+    recommendation = [(business,(( (r_bar[business]/5)+ ldaSim[business] + nameSim[business]+ categorySim[business]) /4)) for business in intersect_list]
+    sorted_recommednation = sorted(recommendation, key=lambda item: -item[1])
+    print(sorted_recommednation)
+    # recommendation={}
+    # for i in intersect_list:
+
+    #     recommendation.setdefault(i,0)
+    #     recommendation[i]= ((r_bar[i]/5)+ldaSim(i))/2
+    # print(recommendation)
+
+    # restaurants = set()
+    # restaurants.
+    # # restaurants |= set(key_b)
+    # # restaurants |= set(key_c)
+    # # restaurants |= set(key_d)
+    # print(len(restaurants))
+
+    # restaurants.add(key_a)
+    # restaurants.add(key_b)
+    # restaurants.add(key_c)
+    # restaurants.add(key_d)
+
+    # print(len(restaurants))
+    # intersect_business = r_bar.keys()&ldaSim.keys()&nameSim.keys()&categorySim.keys()
+    # print(len(intersect_business))
+    # recommendation ={}
+    # for i in intersect_business:
+    #     recommendation[i] = ((r_bar[i]/5)+nameSim[i]+categorySim[i]+ldaSim(i))/4
+    # print(len(recommendation))
 
 
 
@@ -323,10 +425,20 @@ if __name__ == '__main__':
     # print(vegas_res.count())
     # get_corpus()
     # perform_similarity_query('pizza burger')
-    get_user_lda_sims('utcN2FtmIymOprcfFS-Tfg')
+
+    # get_user_lda_sims('utcN2FtmIymOprcfFS-Tfg')
+
+    # perform_similarity_query("las vegas back family iphone nice")
+
+    # get_user_lda_sims('utcN2FtmIymOprcfFS-Tfg')
 
     #perform_similarity_query("las vegas back family iphone nice")
+
     # get_lda()
     # get_all_restaurant_names()
     # get_all_restaurant_names("pizza hut")
     # extract_reviews_star()
+     get_recommendation("Find me the best chinese food in southamton ")
+    # get_restaurants_categories("chineses")
+
+
