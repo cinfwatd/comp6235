@@ -70,7 +70,7 @@ def save_reviews(word_freq):
     print("Converting to Numpy array")
     data = np.array(container)
     print("Saving to file")
-    np.save('reviews.npy', data)
+    np.save('tmp/reviews.npy', data)
     print("Done")
 
 
@@ -85,7 +85,7 @@ def get_dictionary():
     dictionary.compactify()
     print(dictionary)
     print("Saving dictionary ...")
-    dictionary.save('reviews_word_dictionary.dict')
+    dictionary.save('tmp/reviews_word_dictionary.dict')
     print("Done")
 
 
@@ -105,12 +105,12 @@ def get_corpus_bow():
 
 
 def get_tfidf_transformation():
-    corpus = corpora.MmCorpus('reviews_bow.mm')
+    corpus = corpora.MmCorpus('tmp/reviews_bow.mm')
     tfidf = models.TfidfModel(corpus)
     # print(tfidf)
-    tfidf.save('reviews_tfidf_model.tfidf')
+    tfidf.save('tmp/reviews_tfidf_model.tfidf')
     index = similarities.SparseMatrixSimilarity(tfidf[corpus], num_features=45063)
-    index.save('corpus_tfidf_index')
+    index.save('tmp/corpus_tfidf_index')
 
 
 def perform_similarity_query(query):
@@ -118,7 +118,7 @@ def perform_similarity_query(query):
     query_vec = dictionary.doc2bow(clean(query))
     tfidf = models.TfidfModel.load('tmp/reviews_tfidf_model.tfidf')
     # print(tfidf[query_vec])
-    index = similarities.SparseMatrixSimilarity.load("corpus_tfidf_index")
+    index = similarities.SparseMatrixSimilarity.load("tmp/corpus_tfidf_index")
     sims = index[tfidf[query_vec]]
     lda = models.LdaModel.load('tmp/corpus_lda_10')
     # print(sims[0:10])
@@ -129,7 +129,7 @@ def perform_similarity_query(query):
     total_den = {}
 
     reviews_star = np.load('tmp/reviews_star.npy')
-    reviews_corpus = corpora.MmCorpus('reviews_bow.mm')
+    reviews_corpus = corpora.MmCorpus('tmp/reviews_bow.mm')
 
     count = 0
     pref_topic = {}
@@ -192,7 +192,7 @@ def extract_reviews_star():
         count += 1
         print(count)
     stars = np.array(container)
-    np.save('reviews_star.npy', stars)
+    np.save('tmp/reviews_star.npy', stars)
 
 
 def get_all_restaurant_names(query):
@@ -200,7 +200,7 @@ def get_all_restaurant_names(query):
     for res in db.vegas_restaurants.find({}, {"name": 1}):
         container.append(clean(res['name']))
     data = np.array(container)
-    # np.save('restaurants.npy', data)
+    # np.save('tmp/restaurants.npy', data)
     rest_dict = corpora.Dictionary(container)
     # print(rest_dict)
     bow_corpus = [rest_dict.doc2bow(res) for res in container]
@@ -213,7 +213,7 @@ def get_all_restaurant_names(query):
     # print(type(sims))
     # print(list(enumerate(sims)))
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
-    # index.save('rest_tfidf_index')
+    # index.save('tmp/rest_tfidf_index')
     nameSims = {}
     for i in sims:
         nameSims[i[0]] = i[1]
@@ -238,7 +238,7 @@ def get_all_categories():
         #  container.append(list(re.sub("categories")))
         container.append(clean(" ".join(cat['categories'])))
         data= np.array(container)
-        #np.save('categories.npy',data)
+        np.save('tmp/categories.npy',data)
 
 
 def get_restaurants_categories(query):
@@ -261,11 +261,11 @@ def get_restaurants_categories(query):
 
 
 def get_user_lda_sims(user_id):
-    container = []
-    for review in db.vegas_reviews.find({'user_id': user_id}, {'tokens':1}):
-        container.append(review['tokens'])
+    # container = []
+    # for review in db.vegas_reviews.find({'user_id': user_id}, {'tokens':1}):
+    #     container.append(review['tokens'])
 
-    # np.save('current_user_reviews', container)
+    # np.save('tmp/current_user_reviews', container)
     # print("Loading user reviews")
     reviews = np.load('tmp/current_user_reviews.npy')
     dictionary = corpora.Dictionary.load('tmp/reviews_word_dictionary.dict')
@@ -285,8 +285,8 @@ def get_user_lda_sims(user_id):
         for sim in lda_sims:
             topic.setdefault(sim[0], 0)
             topic[sim[0]] += sim[1]
-    m=max(topic.items(), key=operator.itemgetter(1))[0]
-    print(m)
+    m = max(topic.items(), key=operator.itemgetter(1))[0]
+    # print(m)
     return m
 
     # print(db.vegas_reviews.find({'user_id': 'qL7Astun3i7qwr2IL5iowA'}).count())
@@ -297,7 +297,7 @@ def get_user_lda_sims(user_id):
 #     for review in db.vegas_reviews.find({'user_id': user_id}, {'tokens':1}):
 #         container.append(review['tokens'])
 #
-#     np.save('current_user_reviews', container)
+#     np.save('tmp/current_user_reviews', container)
 #     # print("Loading user reviews")
 #     # reviews = np.load('tmp/current_user_reviews.npy')
 #     reviews = container
@@ -329,19 +329,19 @@ def get_user_lda_sims(user_id):
 
 
 def get_lda():
-    corpus = corpora.MmCorpus('reviews_bow.mm')
+    corpus = corpora.MmCorpus('tmp/reviews_bow.mm')
     dictionary = corpora.Dictionary.load('tmp/reviews_word_dictionary.dict')
     lda = models.LdaModel(corpus, num_topics=10, id2word=dictionary);
-    lda.save('corpus_lda_10')
+    lda.save('tmp/corpus_lda_10')
     lda.print_topics()
 
 def get_user_LDAsim(query):
     dictionary= corpora.Dictionary.load('tmp/reviews_word_dictionary.dict')
-    corpus = corpora.MmCorpus('reviews_bow.mm')
+    corpus = corpora.MmCorpus('tmp/reviews_bow.mm')
     query_vec = dictionary.doc2bow(clean(query))
     lda= models.LdaModel.load('tmp/corpus_lda_10')
     # index = similarities.SparseMatrixSimilarity(lda[corpus],num_features=10)
-    # index.save('corpus_lda_index')
+    # index.save('tmp/corpus_lda_index')
     # index = similarities.SparseMatrixSimilarity.load("corpus_lda_index")
     query_lda= lda[query_vec]
     # sims= index[query_lda]
@@ -400,11 +400,11 @@ def get_recommendation(query):
 
 
 def get_lsi():
-    corpus = corpora.MmCorpus('reviews_bow.mm')
+    corpus = corpora.MmCorpus('tmp/reviews_bow.mm')
     dictionary = corpora.Dictionary.load('tmp/reviews_word_dictionary.dict')
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     # word_freq = get_word_frequencies()
     # print("Length of words: {}".format(len(word_freq)))
     # save_reviews(word_freq)
@@ -438,7 +438,7 @@ if __name__ == '__main__':
     # get_all_restaurant_names()
     # get_all_restaurant_names("pizza hut")
     # extract_reviews_star()
-     get_recommendation("Find me the best chinese food in southamton ")
+    #  get_recommendation("Find me the best chinese food in southamton ")
     # get_restaurants_categories("chineses")
 
 

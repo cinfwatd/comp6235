@@ -97,6 +97,16 @@ $(document).ready(function(){
     function doNothing() {}
     initMap()
 
+    var loader = $('.loading');
+
+    loader.hide();
+    // $('.loading').bind('ajaxStart', function(){
+    //     $(this).show();
+    // }).bind('ajaxStop', function(){
+    //     $(this).hide();
+    // });
+
+
 
     $('#search').on('click', function() {
 
@@ -106,16 +116,22 @@ $(document).ready(function(){
           url: "/query",
           method: "POST",
           data: { query : query },
-          // dataType: "xml"
+        beforeSend: function(){
+            loader.show();
+        },
+          // dataType: "json"
         });
 
         request.done(function( msg ) {
           // $( "#log" ).html( msg );
-
+            loader.hide();
+            query.val('');
             console.log(msg)
         });
 
         request.fail(function( jqXHR, textStatus ) {
+            loader.hide();
+
           alert( "Request failed: " + textStatus );
         });
     });
