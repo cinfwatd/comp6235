@@ -1,10 +1,13 @@
 from pymongo import MongoClient
 from flask import Flask, session, redirect, url_for, escape, request, render_template, abort
+from library import lib
 app = Flask(__name__)
 
 client = MongoClient()
 db = client.yelp
 #print(db.collection_names())
+
+
 
 
 def get_latitude(business_id):
@@ -55,6 +58,14 @@ def admin():
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
+        user_id = request.form.get('user_id')
+        # print(user_id)
+
+        print(lib.get_user_lda_sims(user_id))
+        # library.get_user_lda_sims()
+        # lib.get_user_lda_sims()
+
+
         return redirect('/')
     return render_template('login.html')
 
