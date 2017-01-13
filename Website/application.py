@@ -62,7 +62,7 @@ def login():
 def logout():
     # remove the username from the session
     session.pop('username', None)
-    return redirect(url_for('index'))
+    return redirect(url_for('login'))
 
 
 def do_login():
