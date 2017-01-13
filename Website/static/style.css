@@ -227,13 +227,16 @@ body {
 }
 
 .restaurants-container {
-    background-color: white;
-    padding: 10px;
+    /*background-color: white;*/
     margin-right: 10px;
 }
 
 .restaurant {
     border-bottom: 1px solid #E0E0E0;
+    background-color: white;
+    margin-bottom: 5px;
+    padding: 10px;
+
 }
 
 #restaurants-box {
