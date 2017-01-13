@@ -71,6 +71,12 @@ mock_restaurants = ['mVHrayjG3uZ_RLHkLj-AMg','KayYbHCt-RkbGcPdGOThNg', 'wJr6kSA5
 #print(get_latitude('m5hMJ7SPIK7are8SykvlvA'))
 
 
+@app.route('/query', methods=["GET", "POST"])
+def search_query():
+    if request.method == 'POST':
+
+        return "yes"
+
 
 @app.route('/')
 @app.route('/index')

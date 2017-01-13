@@ -96,5 +96,28 @@ $(document).ready(function(){
 
     function doNothing() {}
     initMap()
+
+
+    $('#search').on('click', function() {
+
+        var query = $("#query").val();
+
+        var request = $.ajax({
+          url: "/query",
+          method: "POST",
+          data: { query : query },
+          // dataType: "xml"
+        });
+
+        request.done(function( msg ) {
+          // $( "#log" ).html( msg );
+
+            console.log(msg)
+        });
+
+        request.fail(function( jqXHR, textStatus ) {
+          alert( "Request failed: " + textStatus );
+        });
+    });
 });
 
