@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAPV7m3xJuLkXdEFXP1UAGV2-AcY9QJjU&callback=initMap">
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+     <form class="form-signin" id="login-form">
+        <h2 class="form-signin-heading">Please sign in</h2>
+        <label for="inputEmail" class="sr-only">User ID</label>
+        <input type="text" id="user_id" class="form-control" placeholder="User ID" required autofocus>
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+      </form>
+    </div>
+{% endblock %}
