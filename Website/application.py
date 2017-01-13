@@ -62,6 +62,7 @@ def login():
         # print(user_id)
 
         print(lib.get_user_lda_sims(user_id))
+        # lib.
         # library.get_user_lda_sims()
         # lib.get_user_lda_sims()
 
